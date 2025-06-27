@@ -19,10 +19,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 // Configuração da conexão MySQL
-$host = 'sql304.infinityfree.com';
-$usuario = 'if0_39333353';
-$senha = 'mpyp3rkaaFj2wx3';
-$banco = 'if0_39333353_registro_ponto';
+$host = 'seu host';
+$usuario = 'seu usuario';
+$senha = 'sua senha';
+$banco = 'seu banco de dados';
 
 // Criando conexão
 $mysqli = new mysqli($host, $usuario, $senha, $banco);
