@@ -1,4 +1,8 @@
 <?php
+
+// Define o fuso horário do PHP para São Paulo
+date_default_timezone_set('America/Sao_Paulo');
+
 session_start();
 
 // Verifica se o usuário está autenticado
@@ -16,10 +20,14 @@ $banco = 'if0_39333353_registro_ponto';
 // Conexão com o MySQL
 $mysqli = new mysqli($host, $usuario, $senha, $banco);
 
+// Define o fuso horário do MySQL para UTC-3 (Brasília)
+$mysqli->query("SET time_zone = '-03:00'");
+
 // Verifica a conexão
 if ($mysqli->connect_error) {
     die("Falha na conexão: " . $mysqli->connect_error);
 }
+
 
 $id_usuario = $_SESSION['id_usuario'];
 
