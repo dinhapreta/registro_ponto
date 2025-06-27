@@ -1,4 +1,7 @@
-<?php
+<?php 
+// Define o fuso horário do Brasil (UTC-3)
+date_default_timezone_set('America/Sao_Paulo');
+
 //Isso instrui o navegador a não armazenar em cache a página
 header("Cache-Control: no-cache, must-revalidate");
 
