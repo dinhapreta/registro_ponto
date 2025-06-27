@@ -1,4 +1,9 @@
+<!-- informa qual o erro especifico o site apresenta para não carregar corretamente, ao invés de aparecer somente erro 403, 500,404, etc" -->
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
 
 // Verifica se o formulário foi submetido
@@ -7,55 +12,63 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if(isset($_POST['sair'])) {
         // Configura a sessão de redirecionamento
         $_SESSION['redirect_to_login'] = true;
-        // Redireciona para a página de login
+        // Redireciona para a página de logout
         header('Location: logout.php');
         exit;
     }
 }
 
-// Conexão com o MySQL
-$usuario = 'root';
-$senha = '';
-$database= 'registro_ponto';
-$host='localhost';
+// Configuração da conexão MySQL
+$host = 'sql304.infinityfree.com';
+$usuario = 'if0_39333353';
+$senha = 'mpyp3rkaaFj2wx3';
+$banco = 'if0_39333353_registro_ponto';
 
-// Cria a conexão
-$conn = new mysqli($host, $usuario, $senha, $database);
+// Criando conexão
+$mysqli = new mysqli($host, $usuario, $senha, $banco);
 
-// Verifica a conexão
-if ($conn->connect_error) {
-    die("Falha na conexão: " . $conn->connect_error);
+// Verifica se houve erro na conexão
+if ($mysqli->connect_error) {
+    die("Falha na conexão: (" . $mysqli->connect_errno . ") " . $mysqli->connect_error);
 }
 
-// Verifica se o formulário foi enviado
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+// Processa o login se o formulário foi enviado (e não é botão sair)
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST['sair'])) {
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']);
 
-    // Consulta SQL para verificar as credenciais
-    $sql = "SELECT id FROM usuarios WHERE username = ? AND password = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ss", $username, $password);
+    // Busca usuário pelo username
+    $sql = "SELECT id, password FROM usuarios WHERE username = ?";
+    $stmt = $mysqli->prepare($sql);
+    if (!$stmt) {
+        die("Erro na preparação da consulta: " . $mysqli->error);
+    }
+
+    $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        // Credenciais corretas, obtém o ID do usuário e armazena na sessão
         $row = $result->fetch_assoc();
-        session_start();
-        $_SESSION['id_usuario'] = $row['id'];
-        // Redireciona para pausas.php
-        header('Location: pausas.php');
-        exit;
+
+        // Senha armazenada em texto puro (não recomendado)
+        if ($password === $row['password']) {
+            $_SESSION['id_usuario'] = $row['id'];
+            header('Location: pausas.php');
+            exit;
+        } else {
+            echo "Senha incorreta.";
+        }
     } else {
-        // Credenciais incorretas, exibe uma mensagem de erro
-        echo "Usuário ou senha incorretos.";
+        echo "Usuário não encontrado.";
     }
+
+    $stmt->close();
 }
 
-// Fecha a conexão
-$conn->close();
+$mysqli->close();
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
   <head>
